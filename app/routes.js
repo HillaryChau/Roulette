@@ -1,195 +1,140 @@
-module.exports = function(app, passport, db) {
+module.exports = function (app, passport, db) {
+  app.get('/', function (req, res) {
+    db.collection('games')
+      .find()
+      .toArray((err, bets) => {
+        if (err) return console.log(err);
+        let playerWinnings = 0;
+        let betSquare = 'None';
+        let resultSquare = 'None';
 
-// normal routes ===============================================================
+        if (bets.length) {
+          playerWinnings = bets
+            .map((bet) => bet.playerOutcome)
+            .reduce((a, b) => a + b);
 
-    // show the home page (will also have our login links)
-    app.get('/', function(req, res) {
-        res.render('index.ejs');
-    });
+          betSquare = bets[bets.length - 1].betSquare;
+          resultSquare = bets[bets.length - 1].resultSquare;
+        }
 
-    // PROFILE SECTION =========================
+        res.render('index.ejs', {
+          playerWinnings,
+          betSquare,
+          resultSquare,
+        });
+      });
+  });
 
+  app.get('/profile', function (req, res) {
+    db.collection('games')
+      .find()
+      .toArray((err, bets) => {
+        if (err) return console.log(err);
 
-    app.get('/profile', function(req, res) {
+        const casinoWinnings = bets
+          .map((bet) => bet.casinoOutcome)
+          .reduce((a, b) => a + b);
 
-      let findAllDocuments = db.collection('profits').find().toArray()
-  
-      let findAddProfits =  db.collection('profits').aggregate(
-          [
-            {$match: {// match acts as a filter to find all of the documents with the conditions below
-              winner: 'casino'//these are said conditions, in this case we are filtering all docs where winner is the casino
-              }
-            },
-            {$group: {_id: null,// group puts all of the returned matches in one group
-                      total: { $sum: '$betAmount'}}// this code sets the total property to the sum of all of the bet amounts in the group
-            }
-          ]).toArray()
-
-      let findLosses = db.collection('profits').aggregate(
-        [
-          {$match: {
-            winner: 'player'
-            }
-          },
-          {$group: {_id: null,
-                    total: {$sum : '$betAmountNegative' }        
-          }}
-        ]
-      ).toArray()
-
-      let findWinnerCasino = db.collection('profits').countDocuments({winner: 'casino'})
-      let findWinnerPlayer = db.collection('profits').countDocuments({winner: 'player'})
-  
-      Promise.all([findAllDocuments, findAddProfits, findLosses, findWinnerCasino, findWinnerPlayer]).then((values) => {
-        
-        
-        let [findAllDocuments, findAddProfitsResults, findLossesValues, findWinnerCasinoResults, findWinnerPlayerResults] = values;
-
-        console.log('Hi')
-        console.log(findLossesValues)
-
-        findLossesValues = findLossesValues.length === 0 ? findLossesValues[0].total = 0 : findLossesValues[0].total
-
-        console.log(findLossesValues)
-        console.log(findWinnerPlayerResults)
-  
+        const casinoWins = bets.filter(
+          ({ casinoOutcome }) => casinoOutcome > 0,
+        );
+        const playerWins = bets.filter(
+          ({ playerOutcome }) => playerOutcome > 0,
+        );
         res.render('profile.ejs', {
           user: req.user,
-          documents: findAllDocuments,
-          addProfits: findAddProfitsResults,
-          subtractProfits: findLossesValues,
-          winnerCasino: findWinnerCasinoResults,
-          playerCasino: findWinnerPlayerResults
-        })
-        console.log(subtractProfits)
-      }).catch((error) => {
-        console.log(error)
+          bets,
+          casinoWinnings,
+          casinoWins,
+          playerWins,
+        });
       });
-    });
+  });
 
-    // LOGOUT ==============================
-    app.get('/logout', function(req, res) {
-        req.logout();
+  // LOGOUT ==============================
+  app.get('/logout', function (req, res) {
+    req.logout();
+    res.redirect('/');
+  });
+
+  app.post('/bets', (req, res) => {
+    const { betAmount, square: betSquare } = req.body;
+    const resultSquare = Math.floor(Math.random() * 36) + 1;
+    const winner = resultSquare === betSquare ? 'player' : 'casino';
+    const casinoOutcome = winner === 'casino' ? betAmount : -betAmount;
+    const playerOutcome = winner === 'casino' ? -betAmount : betAmount;
+
+    db.collection('games').save(
+      {
+        casinoOutcome,
+        playerOutcome,
+        betSquare,
+        resultSquare,
+      },
+      (err, result) => {
+        if (err) return console.log(err);
         res.redirect('/');
+      },
+    );
+  });
+
+  // =============================================================================
+  // AUTHENTICATE (FIRST LOGIN) ==================================================
+  // =============================================================================
+
+  // locally --------------------------------
+  // LOGIN ===============================
+  // show the login form
+  app.get('/login', function (req, res) {
+    res.render('login.ejs', { message: req.flash('loginMessage') });
+  });
+
+  // process the login form
+  app.post(
+    '/login',
+    passport.authenticate('local-login', {
+      successRedirect: '/profile', // redirect to the secure profile section
+      failureRedirect: '/login', // redirect back to the signup page if there is an error
+      failureFlash: true, // allow flash messages
+    }),
+  );
+
+  // SIGNUP =================================
+  // show the signup form
+  app.get('/signup', function (req, res) {
+    res.render('signup.ejs', { message: req.flash('signupMessage') });
+  });
+
+  // process the signup form
+  app.post(
+    '/signup',
+    passport.authenticate('local-signup', {
+      successRedirect: '/profile', // redirect to the secure profile section
+      failureRedirect: '/signup', // redirect back to the signup page if there is an error
+      failureFlash: true, // allow flash messages
+    }),
+  );
+
+  // =============================================================================
+  // UNLINK ACCOUNTS =============================================================
+  // =============================================================================
+  // used to unlink accounts. for social accounts, just remove the token
+  // for local account, remove email and password
+  // user account will stay active in case they want to reconnect in the future
+
+  // local -----------------------------------
+  app.get('/unlink/local', isLoggedIn, function (req, res) {
+    var user = req.user;
+    user.local.email = undefined;
+    user.local.password = undefined;
+    user.save(function (err) {
+      res.redirect('/profile');
     });
-
-// message board routes ===============================================================
-
-    app.post('/profile', (req, res) => {
-      console.log(req.body);
-      db.collection('profits').save(
-        {winner: req.body.winner,
-        betAmount: req.body.betAmount, betAmountNegative: (req.body.betAmount * -1)}, (err, result) => {
-             if (err) return console.log(err)
-            console.log('saved to database')
-      })
-      })
-    //   db.collection('profits').aggregate(
-    //     [
-    //       {$match: {// match acts as a filter to find all of the documents with the conditions below
-    //         winner: 'casino',//these are said conditions, in this case we are filtering all docs where winner is the casino
-    //         }
-    //       },
-    //       {$group: {_id: null,// group puts all of the returned matches in one group
-    //                 total: { $sum: '$betAmount'}}// this code sets the total property to the sum of all of the bet amounts in the group
-    //       }
-    //     ]).toArray().then((result) => {
-    //       console.log(result)
-    //   }
-    //
-
-    var ObjectId = require('mongodb').ObjectId;
-
-    // app.put('/profile', (req, res) => {
-    //   db.collection('profits')
-    //   .findOneAndUpdate({_id: ObjectId(req.body.docId)}, {
-    //     $set: {
-    //       thumbUp:req.body.thumbUp + 1
-    //     }
-    //   }, {
-    //     sort: {_id: -1},
-    //     upsert: true
-    //   }, (err, result) => {
-    //     if (err) return res.send(err)
-    //     res.send(result)
-    //   })
-    // })
-    app.put('/thumbDown', (req, res) => { // add to our thumbs up
-      db.collection('messages') //refers to the mongodb that holds user information
-      .findOneAndUpdate({name: req.body.name, msg: req.body.msg}, {
-        $set: {
-          thumbUp:req.body.thumbUp - 1
-        }
-      }, {
-        sort: {_id: -1},
-        upsert: true
-      }, (err, result) => {
-        if (err) return res.send(err)
-        res.send(result)
-      })
-    })
-
-    app.delete('/messages', (req, res) => {
-      db.collection('messages').findOneAndDelete({name: req.body.name, msg: req.body.msg}, (err, result) => {
-        if (err) return res.send(500, err)
-        res.send('Message deleted!')
-      })
-    })
-
-// =============================================================================
-// AUTHENTICATE (FIRST LOGIN) ==================================================
-// =============================================================================
-
-    // locally --------------------------------
-        // LOGIN ===============================
-        // show the login form
-        app.get('/login', function(req, res) {
-            res.render('login.ejs', { message: req.flash('loginMessage') });
-        });
-
-        // process the login form
-        app.post('/login', passport.authenticate('local-login', {
-            successRedirect : '/profile', // redirect to the secure profile section
-            failureRedirect : '/login', // redirect back to the signup page if there is an error
-            failureFlash : true // allow flash messages
-        }));
-
-        // SIGNUP =================================
-        // show the signup form
-        app.get('/signup', function(req, res) {
-            res.render('signup.ejs', { message: req.flash('signupMessage') });
-        });
-
-        // process the signup form
-        app.post('/signup', passport.authenticate('local-signup', {
-            successRedirect : '/profile', // redirect to the secure profile section
-            failureRedirect : '/signup', // redirect back to the signup page if there is an error
-            failureFlash : true // allow flash messages
-        }));
-
-// =============================================================================
-// UNLINK ACCOUNTS =============================================================
-// =============================================================================
-// used to unlink accounts. for social accounts, just remove the token
-// for local account, remove email and password
-// user account will stay active in case they want to reconnect in the future
-
-    // local -----------------------------------
-    app.get('/unlink/local', isLoggedIn, function(req, res) {
-        var user            = req.user;
-        user.local.email    = undefined;
-        user.local.password = undefined;
-        user.save(function(err) {
-            res.redirect('/profile');
-        });
-    });
-
+  });
 };
 
 // route middleware to ensure user is logged in
 function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated())
-        return next();
-
-    res.redirect('/');
+  if (req.isAuthenticated()) return next();
+  res.redirect('/');
 }

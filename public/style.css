@@ -1,40 +1,46 @@
-body{
-  padding-top:80px;
-  word-wrap:break-word;
+body {
+  padding-top: 80px;
+  word-wrap: break-word;
 }
 
-.jumbotron{
+.jumbotron {
   display: flex;
   flex-direction: row;
 }
 
-.secBetAmount{
+.secBetAmount {
   display: flex;
   flex-direction: column;
 }
-.secPokerChips{
+.secPokerChips {
   display: flex;
-  width: 80%;
 }
 
-img{
+img {
   height: 200px;
 }
+
 .fa-trash::before {
-    content: "\f014";
+  content: '\f014';
 }
 
-.num:hover{
-  background-color: magenta;
-  border-color: magenta;
+.num:hover {
+  transform: scale(1.2);
+  cursor: pointer;
 }
 
-.pokerchips{
-  width: 10%;
-  height: 100px;
+.pokerchips {
+  height: 50px;
   border: 1px solid black;
-  margin:0% 10%;
-  float: left;
+  padding: 5px;
+}
+
+.bets-resets {
+  margin-left: auto;
+}
+
+.info-section {
+  width: 30%;
 }
 
 body.moving {
@@ -44,7 +50,7 @@ body.moving {
 .roulette {
   margin: 40px;
   padding: 40px;
-  background: #1C7022;
+  background: #1c7022;
   display: table;
   position: relative;
   width: 775px;
@@ -74,14 +80,15 @@ tr {
 }
 /* elements */
 .roulette .sector {
-  background: #1C7022;
-  color: #8EB891;
+  background: #1c7022;
+  color: #8eb891;
 }
 .roulette .sector .vt {
   font-size: 15px;
 }
 .roulette .num {
   font-size: 22px;
+  z-index: 1;
 }
 .roulette .num span {
   display: block;
@@ -96,14 +103,14 @@ tr {
 }
 /* colors */
 .roulette .green {
-  background: #1C7022;
-  color: #8EB891;
+  background: #1c7022;
+  color: #8eb891;
 }
 .roulette .red {
-  background: #A91607;
-  color: #8EB891;
+  background: #a91607;
+  color: #8eb891;
 }
 .roulette .black {
-  background: #0E3811;
-  color: #8EB891;
+  background: #0e3811;
+  color: #8eb891;
 }
