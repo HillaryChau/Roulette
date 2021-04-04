@@ -66,17 +66,17 @@
       <div class="jumbotron text-center">
       <section class="secPlayerTotal">
         <h3>Player Winnings: $ <span class="player-winnings"><%= playerWinnings %></span></h3>
-        <h3 class="bet-text">Last bet was on box: <%= betSquare %> and selected box was <%= resultSquare %></h3>
+        <% if (betSquare !== 0) { %>
+          <h3 class="bet-text">Last bet was on box: <%= betSquare %> and selected box was <%= resultSquare %></h3>
+        <% } %>
       </section>
       </div>
 
       <div class="jumbotron text-center">
         <div class="info-section">
           <section class="secBetAmount">
-            <p>
-              <span>Bet Amount: $ </span>
-              <span class="bet-amount">0</span>
-            </p>
+            <h3>Bet Amount:</h3>
+            <p> $ <span class="bet-amount">0</span></p>
           </section>
           <section class="pending-square-section">
             <h3>Pending Box:</h3>

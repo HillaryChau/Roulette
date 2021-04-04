@@ -8,9 +8,20 @@ module.exports = function (app, passport, db) {
         let betSquare = 'N/A';
         let resultSquare = 'N/A';
 
+
+//this allows the bets to reset only the user winnings w/o affect casino winning records//
         if (bets.length) {
-          playerWinnings = bets
-            .map((bet) => bet.playerOutcome)
+          const postResetBets = []
+          for (let i = bets.length - 1; i > 0; i--) {
+            postResetBets.push(bets[i])
+
+            if (bets[i].reset) {
+              break
+            }
+          }
+
+          playerWinnings = postResetBets
+            .map((postResetBets) => postResetBets.playerOutcome)
             .reduce((a, b) => a + b);
 
           betSquare = bets[bets.length - 1].betSquare;
@@ -70,6 +81,22 @@ module.exports = function (app, passport, db) {
         playerOutcome,
         betSquare,
         resultSquare,
+      },
+      (err, result) => {
+        if (err) return console.log(err);
+        res.redirect('/');
+      },
+    );
+  });
+
+  app.post('/reset-bets', (req, res) => {
+    db.collection('games').save(
+      {
+        casinoOutcome: 0,
+        playerOutcome: 0,
+        betSquare: 0,
+        resultSquare: 0,
+        reset: true
       },
       (err, result) => {
         if (err) return console.log(err);

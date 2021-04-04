@@ -8,7 +8,8 @@ Tech used: HTML, EJS, CSS, JavaScript, Node.js, Express.js
 
 Please click the link below to interact with it:
 
-<img src="public/img/coffee1.PNG" alt="roulette" style="height: 100px; width:100px;"/>
+
+<img src="public/img/roulette1.PNG" alt="roulette" style="height: 100px; width:100px;"/>
 
 ## Lesson Learned:
 

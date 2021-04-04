@@ -1,0 +1,155 @@
+diff --git a/app/routes.js b/app/routes.js
+index ca4e3c8..598342b 100644
+--- a/app/routes.js
++++ b/app/routes.js
+@@ -7,10 +7,21 @@ module.exports = function (app, passport, db) {
+         let playerWinnings = 0;
+         let betSquare = 'N/A';
+         let resultSquare = 'N/A';
++        let reset = false;
+ 
+         if (bets.length) {
+-          playerWinnings = bets
+-            .map((bet) => bet.playerOutcome)
++          const postResetBets = []
++          for (let i = bets.length - 1; i > 0; i--) {
++            postResetBets.push(bets[i])
++
++            if (bets[i].reset) {
++              reset = true;
++              break
++            }
++          }
++
++          playerWinnings = postResetBets
++            .map((postResetBets) => postResetBets.playerOutcome)
+             .reduce((a, b) => a + b);
+ 
+           betSquare = bets[bets.length - 1].betSquare;
+@@ -21,6 +32,7 @@ module.exports = function (app, passport, db) {
+           playerWinnings,
+           betSquare,
+           resultSquare,
++          reset
+         });
+       });
+   });
+@@ -78,6 +90,22 @@ module.exports = function (app, passport, db) {
+     );
+   });
+ 
++  app.post('/reset-bets', (req, res) => {
++    db.collection('games').save(
++      {
++        casinoOutcome: 0,
++        playerOutcome: 0,
++        betSquare: 0,
++        resultSquare: 0,
++        reset: true
++      },
++      (err, result) => {
++        if (err) return console.log(err);
++        res.redirect('/');
++      },
++    );
++  });
++
+   // =============================================================================
+   // AUTHENTICATE (FIRST LOGIN) ==================================================
+   // =============================================================================
+diff --git a/public/main.js b/public/main.js
+index e62cea5..daaca2c 100644
+--- a/public/main.js
++++ b/public/main.js
+@@ -52,7 +52,16 @@ function onResetBet() {
+   document.querySelector('.pending-square').innerHTML = 'Not yet selected';
+   document.querySelector('.bet-amount').innerHTML = 0;
+   document.querySelector('.player-selection').innerHTML = '';
+-  document.querySelector('.bet-text').innerHTML = "";
++
++  fetch('reset-bets', {
++    method: 'post',
++    headers: { 'Content-Type': 'application/json' },
++    body: JSON.stringify({
++      reset: true,
++    }),
++  }).then(function () {
++    window.location.reload();
++  });
+ }
+ 
+ document.querySelector('#submit-bet').addEventListener('click', onSubmitBet);
+diff --git a/public/style.css b/public/style.css
+index fcb918d..8d8fa37 100644
+--- a/public/style.css
++++ b/public/style.css
+@@ -14,6 +14,15 @@ button{
+   background: orange;
+ }
+ 
++#submit-bet, #reset-bet {
++  margin: 5px;
++  border-radius: 5px;
++}
++
++#submit-bet:active, #reset-bet:active {
++  background-color: rgba(250, 150, 80);
++}
++
+ .jumbotron {
+   display: flex;
+   flex-direction: row;
+@@ -71,7 +80,7 @@ body.moving {
+ }
+ 
+ .roulette {
+-  background: #1c7022;
++  background: #0e3811;
+   display: table;
+   position: relative;
+   width: 100%;
+@@ -104,7 +113,7 @@ tr {
+ }
+ /* elements */
+ .roulette .sector {
+-  background: #1c7022;
++  background: #0e3811;
+   color: #8eb891;
+ }
+ .roulette .sector .vt {
+@@ -127,7 +136,7 @@ tr {
+ }
+ /* colors */
+ .roulette .green {
+-  background: #1c7022;
++  background: #0e3811;
+   color: #8eb891;
+ }
+ .roulette .red {
+diff --git a/views/index.ejs b/views/index.ejs
+index 0a1077e..b6d1312 100644
+--- a/views/index.ejs
++++ b/views/index.ejs
+@@ -66,17 +66,17 @@
+       <div class="jumbotron text-center">
+       <section class="secPlayerTotal">
+         <h3>Player Winnings: $ <span class="player-winnings"><%= playerWinnings %></span></h3>
+-        <h3 class="bet-text">Last bet was on box: <%= betSquare %> and selected box was <%= resultSquare %></h3>
++        <% if (betSquare !== 0) { %>
++          <h3 class="bet-text">Last bet was on box: <%= betSquare %> and selected box was <%= resultSquare %></h3>
++        <% } %>
+       </section>
+       </div>
+ 
+       <div class="jumbotron text-center">
+         <div class="info-section">
+           <section class="secBetAmount">
+-            <p>
+-              <span>Bet Amount: $ </span>
+-              <span class="bet-amount">0</span>
+-            </p>
++            <h3>Bet Amount:</h3>
++            <p> $ <span class="bet-amount">0</span></p>
+           </section>
+           <section class="pending-square-section">
+             <h3>Pending Box:</h3>

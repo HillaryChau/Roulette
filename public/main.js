@@ -52,7 +52,16 @@ function onResetBet() {
   document.querySelector('.pending-square').innerHTML = 'Not yet selected';
   document.querySelector('.bet-amount').innerHTML = 0;
   document.querySelector('.player-selection').innerHTML = '';
-  document.querySelector('.bet-text').innerHTML = "";
+
+  fetch('reset-bets', {
+    method: 'post',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      reset: true,
+    }),
+  }).then(function () {
+    window.location.reload();
+  });
 }
 
 document.querySelector('#submit-bet').addEventListener('click', onSubmitBet);

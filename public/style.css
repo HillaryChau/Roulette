@@ -10,8 +10,21 @@ body {
   font-weight: 800;
 }
 
+h3{
+  text-align: left;
+}
+
 button{
   background: orange;
+}
+
+#submit-bet, #reset-bet {
+  margin: 5px;
+  border-radius: 5px;
+}
+
+#submit-bet:active, #reset-bet:active {
+  background-color: rgba(250, 150, 80);
 }
 
 .jumbotron {
@@ -71,7 +84,7 @@ body.moving {
 }
 
 .roulette {
-  background: #1c7022;
+  background: #0e3811;
   display: table;
   position: relative;
   width: 100%;
@@ -104,7 +117,7 @@ tr {
 }
 /* elements */
 .roulette .sector {
-  background: #1c7022;
+  background: #0e3811;
   color: #8eb891;
 }
 .roulette .sector .vt {
@@ -127,7 +140,7 @@ tr {
 }
 /* colors */
 .roulette .green {
-  background: #1c7022;
+  background: #0e3811;
   color: #8eb891;
 }
 .roulette .red {
