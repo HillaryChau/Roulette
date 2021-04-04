@@ -1,55 +1,62 @@
 <!doctype html>
 <html>
-   <head>
-      <title>Roulette Game</title>
-      <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-      <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-      <link rel="stylesheet" href="style.css">
-   </head>
-   <body>
-      <div class="container">
-         <div class="page-header text-center">
-            <h1><span class="fa fa-anchor"></span> Profile Page</h1>
-            <a href="/logout" class="btn btn-default btn-sm">Logout</a>
-         </div>
-         <div class="row">
-            <!-- LOCAL INFORMATION -->
-            <div class="col-sm-6">
-               <div class="well">
-                  <h3><span class="fa fa-user"></span> Local</h3>
-                  <% if (user.local.email) { %>
-                  <p>
-                     <strong>id</strong>: <%= user._id %><br>
-                     <strong>email</strong>: <%= user.local.email %><br>
-                     <strong>password</strong>: <%= user.local.password %>
-                  </p>
-                  <a href="/unlink/local" class="btn btn-default">Unlink</a>
-                  <% } else { %>
-                  <a href="/connect/local" class="btn btn-default">Connect Local</a>
-                  <% } %>
-               </div>
-            </div>
-         </div>
-         <section class ="secResultsProfits">
-            <h2>NET PROFITS</h2>
-            <span class ="spanNetProfit"><%= casinoWinnings %></span>
-         </section>
-         <section class ="secResultsPlayerStats">
-            <h2>Player Wins</h2>
-            <span class ="spanPlayerWins"><%= casinoWins.length %></span>
-            <h2>House Wins</h2>
-            <span class ="spanHouseWins"><%= playerWins.length %></span>
-         </section>
-         <section class="history">
-           <h2>History</h2>
-           <% for (let i=0; i<casinoWins.length;i++) {%>
-            <p>Casino won: <%= casinoWins[i].casinoOutcome %></p>
-           <% } %>
-           <% for (let i=0; i<playerWins.length;i++) {%>
-            <p>Player won: <%= playerWins[i].playerOutcome %></p>
-           <% } %>
-         </section>
-         <script src="main.js"></script>
+
+<head>
+  <title>Roulette Game</title>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="page-header text-center">
+      <h1><span class="fa fa-money"></span> Profile Page</h1>
+      <a href="/logout" class="btn btn-default btn-sm">Logout</a>
+    </div>
+
+    <div class="d-flex">
+
+        <!-- LOCAL INFORMATION -->
+        <div class="col-sm-6">
+          <div class="well">
+            <h3><span class="fa fa-user"></span> Local</h3>
+            <% if (user.local.email) { %>
+            <p>
+              <strong>id</strong>: <%= user._id %><br>
+              <strong>email</strong>: <%= user.local.email %><br>
+              <strong>password</strong>: <%= user.local.password %>
+            </p>
+            <a href="/unlink/local" class="btn btn-default">Unlink</a>
+            <% } else { %>
+            <a href="/connect/local" class="btn btn-default">Connect Local</a>
+            <% } %>
+          </div>
+
       </div>
-   </body>
+
+      <div class="col-sm-6 well">
+        <section class="secResultsProfits">
+          <h2>NET PROFITS: $<span class="spanNetProfit"><%= casinoWinnings %></span></h2>
+        </section>
+
+        <section class="secResultsPlayerStats">
+          <h2>Player Wins: <span class="spanPlayerWins"><%= casinoWins.length %></span></h2>
+          <h2>House Wins: <span class="spanHouseWins"><%= playerWins.length %></span></h2>
+        </section>
+
+        <section class="history">
+          <h2>History: <% for (let i=0; i<casinoWins.length;i++) {%></h2>
+          <p>Casino won: <%= casinoWins[i].casinoOutcome %></p>
+          <% } %>
+          <% for (let i=0; i<playerWins.length;i++) {%>
+          <p>Player won: <%= playerWins[i].playerOutcome %></p>
+          <% } %>
+        </section>
+      </div>
+    </div>
+  </div>
+  <script src="main.js"></script>
+</body>
+
 </html>

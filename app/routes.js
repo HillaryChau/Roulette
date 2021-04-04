@@ -5,8 +5,8 @@ module.exports = function (app, passport, db) {
       .toArray((err, bets) => {
         if (err) return console.log(err);
         let playerWinnings = 0;
-        let betSquare = 'None';
-        let resultSquare = 'None';
+        let betSquare = 'N/A';
+        let resultSquare = 'N/A';
 
         if (bets.length) {
           playerWinnings = bets

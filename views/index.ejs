@@ -10,37 +10,11 @@
       <div class="container">
       <a href="/login" class="btn btn-default"><span class="fa fa-user"></span>Login</a>
       <a href="/signup" class="btn btn-default"><span class="fa fa-user"></span>Signup</a>
-      <div class="jumbotron text-center">
-          <div class="info-section">
-            <section class="secBetAmount">
-               <p>
-                  <span>Bet Amount:</span>
-                  <span class="bet-amount">0</span>
-               </p>
-            </section>
-            <section class="pending-square-section">
-               <p>
-                  <span>Pending Square:</span>
-                  <span class="pending-square">Not yet selected</span>
-               </p>
-            </section>
-            <h3 class="player-selection"></h3>
-         </div>
-         <section class="secPokerChips">
-            <button class="pokerchips" data-value="1">1</button>
-            <button class="pokerchips" data-value="10">10</button>
-            <button class="pokerchips" data-value="50">50</button>
-            <button class="pokerchips" data-value="100">100</button>
-         </section>
-         <div class="bets-resets">
-            <button id="submit-bet" type="button" name="submitBet">BET</button>
-            <button id="reset-bet" type="button" name="resetBet">RESET</button>
-         </div>
+
+      <div class="title">
+      <h1>Roulette</h1>
       </div>
-      <section class="secPlayerTotal">
-         <h3>Player Winnings: <span class="player-winnings"><%= playerWinnings %></span></h3>
-         <h3>Last bet was on square: <%= betSquare %> and selected square was <%= resultSquare %></h3>
-      </section>
+
       <div class="roulette">
          <table>
             <tr class="nums">
@@ -88,6 +62,38 @@
                <td data-value="black" class="num black">31</td>
                <td data-value="red" class="num red">34</td>
          </table>
+      </div>
+      <div class="jumbotron text-center">
+      <section class="secPlayerTotal">
+        <h3>Player Winnings: $ <span class="player-winnings"><%= playerWinnings %></span></h3>
+        <h3 class="bet-text">Last bet was on box: <%= betSquare %> and selected box was <%= resultSquare %></h3>
+      </section>
+      </div>
+
+      <div class="jumbotron text-center">
+        <div class="info-section">
+          <section class="secBetAmount">
+            <p>
+              <span>Bet Amount: $ </span>
+              <span class="bet-amount">0</span>
+            </p>
+          </section>
+          <section class="pending-square-section">
+            <h3>Pending Box:</h3>
+            <p class="pending-square">Not yet selected</p>
+          </section>
+          <h3 class="player-selection"></h3>
+        </div>
+        <section class="secPokerChips">
+          <button class="pokerchips" data-value="1">$1</button>
+          <button class="pokerchips" data-value="10">$10</button>
+          <button class="pokerchips" data-value="50">$50</button>
+          <button class="pokerchips" data-value="100">$100</button>
+        </section>
+        <div class="bets-resets">
+          <button id="submit-bet" type="button" name="submitBet">BET</button>
+          <button id="reset-bet" type="button" name="resetBet">RESET</button>
+        </div>
       </div>
    </body>
    <script type="text/javascript" src="main.js" ></script>

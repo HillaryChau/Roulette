@@ -1,5 +1,5 @@
 function getBetAmount() {
-  return Number(document.querySelector('.bet-amount').innerHTML);
+  return Number(document.querySelector('.bet-amount').innerHTML) || 0;
 }
 
 function getPendingSquare() {
@@ -52,6 +52,7 @@ function onResetBet() {
   document.querySelector('.pending-square').innerHTML = 'Not yet selected';
   document.querySelector('.bet-amount').innerHTML = 0;
   document.querySelector('.player-selection').innerHTML = '';
+  document.querySelector('.bet-text').innerHTML = "";
 }
 
 document.querySelector('#submit-bet').addEventListener('click', onSubmitBet);
