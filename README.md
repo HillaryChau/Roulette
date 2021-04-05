@@ -3,7 +3,7 @@
 This is a full-stack application where the user can play roulette. To play, the user picks a square and place a bet. Next, they click play and then, the computer generates the winning square. If it is a match, then the player wins. If not, then, the casino wins.  
 
 ## How It's Made:
-Tech used: HTML, EJS, CSS, JavaScript, Node.js, Express.js
+Tech used: EJS, CSS, JavaScript, Node.js, Express.js
 
 
 Please click the link below to interact with it:
